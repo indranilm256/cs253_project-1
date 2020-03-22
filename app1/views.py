@@ -1,6 +1,8 @@
 from django.shortcuts import render,redirect
 from app1.models import Profile,Student,Department
 from django.contrib.auth.models import User, auth
+from django.contrib.auth import login,authenticate
+from django.contrib.auth.forms import UserCreationForm
 #import . from models
 import openpyxl
 
@@ -31,6 +33,19 @@ def upload(request):
         return render(request, 'index.html', {"excel_data":excel_data})
 
 
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'signup.html', {'form': form})
 
 def register(request):
     if request.method == 'POST':
